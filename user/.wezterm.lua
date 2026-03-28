@@ -38,7 +38,39 @@ config.window_background_opacity = 1.0
 
 config.enable_tab_bar = true
 config.hide_tab_bar_if_only_one_tab = true
-config.use_fancy_tab_bar = false
+config.use_fancy_tab_bar = true
+
+config.window_frame = {
+	font_size = 14.0,
+	active_titlebar_bg = "#181825",
+	inactive_titlebar_bg = "#181825",
+}
+
+config.colors = {
+	tab_bar = {
+		background = "#181825",
+		active_tab = {
+			bg_color = "#1e1e2e",
+			fg_color = "#cdd6f4",
+		},
+		inactive_tab = {
+			bg_color = "#181825",
+			fg_color = "#6c7086",
+		},
+		inactive_tab_hover = {
+			bg_color = "#313244",
+			fg_color = "#cdd6f4",
+		},
+		new_tab = {
+			bg_color = "#181825",
+			fg_color = "#6c7086",
+		},
+		new_tab_hover = {
+			bg_color = "#313244",
+			fg_color = "#cdd6f4",
+		},
+	},
+}
 
 -- =========================
 -- Scrollback
