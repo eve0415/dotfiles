@@ -49,6 +49,9 @@ MODULES=(
   "zsh|Zsh シェル設定|.zshrc|.zshrc|file"
   "wezterm|WezTerm ターミナル設定|.wezterm.lua|.wezterm.lua|file"
   "git|Git グローバル設定|.gitconfig|.gitconfig|file"
+  "gitignore|Git グローバル ignore|.config/git/ignore|.config/git/ignore|file"
+  "claude|Claude Code 設定|.claude|.claude|dir"
+  "codex|Codex 設定|.codex|.codex|dir"
 )
 
 # =========================
