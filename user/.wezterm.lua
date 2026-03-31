@@ -1,6 +1,6 @@
 local wezterm = require("wezterm")
 
-local config = {}
+local config = wezterm.config_builder()
 
 -- =========================
 -- Font
@@ -71,6 +71,32 @@ config.colors = {
 		},
 	},
 }
+
+-- =========================
+-- Notifications
+-- =========================
+
+config.audible_bell = "Disabled"
+
+wezterm.on("bell", function(window, pane)
+	local msg = pane:get_user_vars().claude_status or "Claude Code"
+
+	local dominated = false
+	if window:is_focused() then
+			local tab = pane:tab()
+			local active_tab = window:mux_window():active_tab()
+			if tab and active_tab and active_tab:tab_id() == tab:tab_id() then
+				dominated = true
+			end
+	end
+
+	if not dominated then
+		window:toast_notification("Claude Code", msg, nil, 4000)
+		wezterm.background_child_process({
+			"afplay", "/System/Library/Sounds/Glass.aiff",
+		})
+	end
+end)
 
 -- =========================
 -- Scrollback

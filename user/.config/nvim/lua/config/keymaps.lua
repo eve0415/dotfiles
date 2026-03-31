@@ -71,3 +71,10 @@ map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move selection up" })
 -- Toggle comment (Ctrl+/)
 map("n", "<C-/>", "gcc", { remap = true, desc = "Toggle comment" })
 map("v", "<C-/>", "gc", { remap = true, desc = "Toggle comment" })
+
+-- Indent / Unindent with Tab / Shift+Tab
+map("n", "<Tab>", ">>", { desc = "Indent line" })
+map("n", "<S-Tab>", "<<", { desc = "Unindent line" })
+map("v", "<Tab>", ">gv", { desc = "Indent selection" })
+map("v", "<S-Tab>", "<gv", { desc = "Unindent selection" })
+map("i", "<S-Tab>", "<C-d>", { desc = "Unindent" })
