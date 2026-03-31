@@ -155,12 +155,10 @@ deploy_module() {
       return 0
       ;;
     modified)
-      # 既存ファイルをバックアップ
-      local backup="${target}.backup.$(date +%Y%m%d_%H%M%S)"
-      warn "${name}: 既存ファイルをバックアップします → ${backup}"
-      if [[ "$type" == "dir" ]]; then
-        cp -r "$target" "$backup"
-      else
+      # 単一ファイルの場合のみここでバックアップ（dirはファイル単位で個別処理）
+      if [[ "$type" == "file" ]]; then
+        local backup="${target}.backup.$(date +%Y%m%d_%H%M%S)"
+        warn "${name}: 既存ファイルをバックアップします → ${backup}"
         cp "$target" "$backup"
       fi
       ;;
@@ -173,12 +171,29 @@ deploy_module() {
 
   # コピー
   if [[ "$type" == "dir" ]]; then
-    rm -rf "$target"
-    cp -r "$source" "$target"
+    # ディレクトリの場合: 中のファイルだけを個別にコピー（既存の他ファイルは残す）
+    local copied=0
+    while IFS= read -r -d '' src_file; do
+      local rel="${src_file#"${source}"/}"
+      local tgt_file="${target}/${rel}"
+
+      mkdir -p "$(dirname "$tgt_file")"
+
+      if [[ -f "$tgt_file" ]] && ! diff -q "$src_file" "$tgt_file" &>/dev/null; then
+        local file_backup="${tgt_file}.backup.$(date +%Y%m%d_%H%M%S)"
+        warn "${name}: ${rel} をバックアップ → ${file_backup}"
+        cp "$tgt_file" "$file_backup"
+      fi
+
+      cp "$src_file" "$tgt_file"
+      copied=$((copied + 1))
+    done < <(find "$source" -type f ! -name '.DS_Store' -print0)
+
+    success "${name}: ${copied} 個のファイルをコピーしました"
   else
     cp "$source" "$target"
+    success "${name}: コピーしました (${target})"
   fi
-  success "${name}: コピーしました (${source} → ${target})"
 }
 
 # =========================
