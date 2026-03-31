@@ -17,6 +17,10 @@ CTX_PCT=$(parse_json '.context_window.used_percentage')
 CTX_SIZE=$(parse_json '.context_window.context_window_size')
 SESSION_ID=$(parse_json '.session_id')
 TOTAL_COST=$(parse_json '.cost.total_cost_usd')
+RATE_5H=$(parse_json '.rate_limits.five_hour.used_percentage')
+RATE_5H_RESET=$(parse_json '.rate_limits.five_hour.resets_at')
+RATE_7D=$(parse_json '.rate_limits.seven_day.used_percentage')
+RATE_7D_RESET=$(parse_json '.rate_limits.seven_day.resets_at')
 
 # --- True-color ANSI palette ---
 C_GREEN='\033[38;2;151;201;195m'
@@ -69,6 +73,23 @@ format_tokens() {
     echo "$(( n / 1000 ))K"
   else
     echo "$n"
+  fi
+}
+
+# --- Time until reset ---
+time_until() {
+  local reset_ts="${1:-}"
+  [[ -z "$reset_ts" ]] && return
+  local now
+  now=$(date +%s)
+  local diff=$(( reset_ts - now ))
+  [[ "$diff" -le 0 ]] && { echo "now"; return; }
+  local hours=$(( diff / 3600 ))
+  local mins=$(( (diff % 3600) / 60 ))
+  if [[ "$hours" -gt 0 ]]; then
+    echo "${hours}h${mins}m"
+  else
+    echo "${mins}m"
   fi
 }
 
@@ -135,14 +156,32 @@ if [[ -n "$CTX_PCT" ]]; then
 fi
 
 # =====================
-# LINE 3: Cost
+# LINE 3: 5h | 7d | cost
 # =====================
 LINE3=""
 
-# Cost
+if [[ -n "$RATE_5H" ]]; then
+  _5h_pct="${RATE_5H%.*}"
+  _5h_color=$(color_by_pct "$_5h_pct")
+  _5h_reset=$(time_until "$RATE_5H_RESET")
+  LINE3+="${_5h_color}⏱ 5h ${_5h_pct}%${RESET}"
+  [[ -n "$_5h_reset" ]] && LINE3+="${C_DIM} (${_5h_reset})${RESET}"
+fi
+
+if [[ -n "$RATE_7D" ]]; then
+  _7d_pct="${RATE_7D%.*}"
+  _7d_color=$(color_by_pct "$_7d_pct")
+  _7d_reset=$(time_until "$RATE_7D_RESET")
+  [[ -n "$LINE3" ]] && LINE3+="$SEP"
+  LINE3+="${_7d_color}⏱ 7d ${_7d_pct}%${RESET}"
+  [[ -n "$_7d_reset" ]] && LINE3+="${C_DIM} (${_7d_reset})${RESET}"
+fi
+
 if [[ -n "$TOTAL_COST" ]] && [[ "$TOTAL_COST" != "0" ]]; then
+  [[ -n "$LINE3" ]] && LINE3+="$SEP"
   LINE3+="${C_GREEN}💰 \$${TOTAL_COST}${RESET}"
 else
+  [[ -n "$LINE3" ]] && LINE3+="$SEP"
   LINE3+="${C_DIM}💰 --${RESET}"
 fi
 
