@@ -18,14 +18,14 @@ USER_DIR="${SCRIPT_DIR}/user"
 HOME_DIR="${HOME}"
 
 # ---- Colors ----
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-BOLD='\033[1m'
-DIM='\033[2m'
-RESET='\033[0m'
+RED=$'\033[0;31m'
+GREEN=$'\033[0;32m'
+YELLOW=$'\033[0;33m'
+BLUE=$'\033[0;34m'
+CYAN=$'\033[0;36m'
+BOLD=$'\033[1m'
+DIM=$'\033[2m'
+RESET=$'\033[0m'
 
 info()    { printf "${BLUE}[info]${RESET}  %s\n" "$*"; }
 success() { printf "${GREEN}[ok]${RESET}    %s\n" "$*"; }
