@@ -68,7 +68,8 @@ BREW_PACKAGES=(
 
   # Modern CLI tools
   fzf        # Fuzzy finder
-  fd         # Fast find alternative (used by fzf config)
+  fd         # Fast find alternative (used by telescope/fzf)
+  ripgrep    # Fast grep (used by telescope/neovim grep)
   neovim     # Text editor
 
   # Shell plugins

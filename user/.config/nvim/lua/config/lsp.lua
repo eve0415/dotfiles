@@ -1,0 +1,4 @@
+-- LSP configuration placeholder
+-- This file is intentionally empty.
+-- Add language server configs here when you're ready.
+-- See :help lsp for details.

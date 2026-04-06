@@ -1,7 +1,7 @@
 approval_policy = "on-request"
 personality = "pragmatic"
 model = "gpt-5.4"
-model_reasoning_effort = "high"
+model_reasoning_effort = "xhigh"
 plan_mode_reasoning_effort = "xhigh"
 
 model_context_window = 1000000

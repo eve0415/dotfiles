@@ -1,0 +1,3 @@
+-- Auto-update placeholder
+-- This file is intentionally empty.
+-- lazy.nvim's built-in checker handles update notifications.
