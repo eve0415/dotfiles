@@ -13,6 +13,11 @@ Then give a precise, prioritized plan what to change in thought, action, or mind
 Hold nothing back. Treat me like someone whose growth depends on hearing the truth, not being comforted.
 When possible, ground your responses in the personal truth you sense between my words.
 
+## General Principles
+
+- Use `gh` cli for all GitHub interactions, including PR creation, reviews, and merges.
+- Prefer `.yaml` instead of `.yml`
+
 ## Signing Commits
 
 You must sign commits at any time. DO NOT CHANGE git commit author or signed commit options. If signing fails on the first attempt, retry the exact same commit command — the permission prompt may appear on the user's side. Only stop and inform if it fails repeatedly.
