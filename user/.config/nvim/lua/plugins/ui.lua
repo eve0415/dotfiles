@@ -194,9 +194,11 @@ return {
       delay = 200,
       spec = {
         { "<leader>b", group = "buffer" },
+        { "<leader>c", group = "code" },
         { "<leader>f", group = "find" },
         { "<leader>g", group = "git" },
         { "<leader>q", group = "quit" },
+        { "<leader>s", group = "search/noice" },
         { "<leader>u", group = "toggle" },
         { "<leader>w", group = "window" },
       },

@@ -33,6 +33,28 @@ map("n", "<leader>qq", "<Cmd>confirm qall<CR>", { desc = "Quit all", silent = tr
 
 -- ── Plugin UIs ────────────────────────────────────────────────
 map("n", "<leader>L", "<Cmd>Lazy<CR>", { desc = "Lazy", silent = true })
+map("n", "<leader>M", "<Cmd>Mason<CR>", { desc = "Mason", silent = true })
+
+-- ── Toggles ───────────────────────────────────────────────────
+map("n", "<leader>uf", function()
+  require("config.lsp").toggle_autoformat()
+end, { desc = "Toggle autoformat", silent = true })
+
+-- ── Linting ───────────────────────────────────────────────────
+map("n", "<leader>cx", function()
+  local file = vim.fn.expand("%:p")
+  local oxlint = vim.fs.find("node_modules/.bin/oxlint", {
+    upward = true,
+    path = vim.fn.expand("%:p:h"),
+  })[1]
+  if oxlint then
+    vim.cmd("!" .. oxlint .. " --fix " .. vim.fn.shellescape(file))
+    vim.cmd("edit") -- reload buffer
+    vim.notify("oxlint --fix applied", vim.log.levels.INFO)
+  else
+    vim.notify("oxlint not found in node_modules", vim.log.levels.WARN)
+  end
+end, { desc = "oxlint --fix", silent = true })
 
 -- ── Better defaults ───────────────────────────────────────────
 -- Keep cursor centered when scrolling

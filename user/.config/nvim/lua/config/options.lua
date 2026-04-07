@@ -10,6 +10,7 @@ opt.signcolumn = "yes"
 opt.cursorline = true
 opt.scrolloff = 8
 opt.sidescrolloff = 8
+opt.whichwrap:append("<,>,h,l")
 
 -- Mouse & clipboard (like VSCode: mouse works, clipboard shared)
 opt.mouse = "a"
