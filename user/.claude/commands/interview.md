@@ -6,7 +6,7 @@ allowed-tools: AskUserQuestion, Write, Read, superpowers:*, feature-dev:*
 model: opus
 ---
 
-Use `using-superpowers` for the start of the session. And then, use `superpowers:brainstorm` and also `superpowers:write-plan` skills/commands/tools. You do not need to commit superpowers docs.
+Use `using-superpowers` for the start of the session. And then, use `brainstorming` skills and also `writing-plans` skills. You must not need to commit superpowers docs.
 Also use `feature-dev` skills.
 
 Follow the user instructions and interview me in detail using the AskUserQuestion tool about literally anything: technical implementation, UI & UX, concerns, tradeoffs, etc. but make sure the questions are not obvious. be very in-depth and continue interviewing me continually until it's complete. then, write the spec to a file.
