@@ -4,7 +4,8 @@
     "ENABLE_TOOL_SEARCH": "true",
     "ENABLE_EXPERIMENTAL_MCP_CLI": "false",
     "CLAUDE_CODE_HIDE_ACCOUNT_INFO": "true",
-    "CLAUDE_CODE_NEW_INIT": "1"
+    "CLAUDE_CODE_NEW_INIT": "1",
+    "CLAUDE_CODE_EFFORT_LEVEL": "max"
   },
   "enableAllProjectMcpServers": true,
   "hooks": {
@@ -65,5 +66,7 @@
     }
   },
   "autoUpdatesChannel": "latest",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "advisorModel": "opus",
+  "effortLevel": "high"
 }
