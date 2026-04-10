@@ -6,7 +6,7 @@ return {
     event = { "InsertEnter", "CmdlineEnter" },
     dependencies = { "rafamadriz/friendly-snippets" },
     opts = {
-      keymap = { preset = "default" },
+      keymap = { preset = "super-tab" },
       appearance = {
         nerd_font_variant = "mono",
       },
@@ -16,6 +16,12 @@ return {
           auto_show_delay_ms = 100,
         },
         ghost_text = { enabled = true },
+        list = {
+          selection = {
+            preselect = true,
+            auto_insert = true,
+          },
+        },
         menu = {
           border = "rounded",
           draw = {
@@ -25,6 +31,9 @@ return {
               { "kind" },
             },
           },
+        },
+        accept = {
+          auto_brackets = { enabled = true },
         },
       },
       signature = { enabled = true },

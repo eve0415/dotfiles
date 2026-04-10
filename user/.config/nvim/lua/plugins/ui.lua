@@ -87,7 +87,7 @@ return {
             height = 0.80,
           },
           sorting_strategy = "ascending",
-          file_ignore_patterns = { "node_modules", ".git/" },
+          file_ignore_patterns = { "%.git/", "node_modules/", "dist/", "build/", "target/", "%.next/", "%.lock$" },
           mappings = {
             i = {
               ["<Esc>"] = actions.close,
@@ -99,6 +99,7 @@ return {
         pickers = {
           find_files = {
             hidden = true,
+            find_command = { "fd", "--type", "f", "--strip-cwd-prefix", "--hidden", "--exclude", ".git" },
           },
         },
       }

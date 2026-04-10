@@ -72,12 +72,7 @@ return {
     },
   },
 
-  -- ── Comment: toggle comments with gc/gcc ───────────────────
-  {
-    "numToStr/Comment.nvim",
-    event = "VeryLazy",
-    opts = {},
-  },
+  -- Comment: gc/gcc is built into Neovim 0.10+, no plugin needed
 
   -- ── Autopairs: auto-close brackets ─────────────────────────
   {
@@ -94,6 +89,29 @@ return {
     opts = {
       indent = { char = "│" },
       scope = { enabled = true, show_start = false, show_end = false },
+    },
+  },
+
+  -- ── Colorizer: inline color previews ───────────────────────
+  {
+    "NvChad/nvim-colorizer.lua",
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {
+      filetypes = { "*" },
+      user_default_options = {
+        names = false,       -- don't highlight color names like "red"
+        RGB = true,          -- #RGB
+        RRGGBB = true,       -- #RRGGBB
+        RRGGBBAA = true,     -- #RRGGBBAA
+        rgb_fn = true,       -- rgb(), rgba()
+        hsl_fn = true,       -- hsl(), hsla()
+        css = true,          -- all CSS features (oklch, lch, lab, etc.)
+        css_fn = true,       -- css color functions
+        tailwind = true,     -- Tailwind CSS colors (bg-red-500, text-blue-300, etc.)
+        mode = "virtualtext", -- "background", "foreground", or "virtualtext"
+        virtualtext = "■",
+        always_update = true,
+      },
     },
   },
 }

@@ -26,7 +26,16 @@ map("n", "<leader>wd", "<Cmd>close<CR>", { desc = "Close split", silent = true }
 map("n", "<leader>w=", "<C-w>=", { desc = "Equalize splits", silent = true })
 
 -- ── Buffers ───────────────────────────────────────────────────
-map("n", "<leader>bd", "<Cmd>bdelete<CR>", { desc = "Delete buffer", silent = true })
+map("n", "<leader>bd", function()
+  local bufs = vim.tbl_filter(function(b)
+    return vim.bo[b].buflisted
+  end, vim.api.nvim_list_bufs())
+  if #bufs <= 1 then
+    vim.cmd("enew | bdelete #")
+  else
+    vim.cmd("bprevious | bdelete #")
+  end
+end, { desc = "Delete buffer", silent = true })
 
 -- ── Quit ──────────────────────────────────────────────────────
 map("n", "<leader>qq", "<Cmd>confirm qall<CR>", { desc = "Quit all", silent = true })
@@ -34,6 +43,13 @@ map("n", "<leader>qq", "<Cmd>confirm qall<CR>", { desc = "Quit all", silent = tr
 -- ── Plugin UIs ────────────────────────────────────────────────
 map("n", "<leader>L", "<Cmd>Lazy<CR>", { desc = "Lazy", silent = true })
 map("n", "<leader>M", "<Cmd>Mason<CR>", { desc = "Mason", silent = true })
+
+-- ── LSP ───────────────────────────────────────────────────────
+map("n", "<leader>cl", function()
+  vim.lsp.stop_client(vim.lsp.get_clients())
+  vim.cmd("edit")
+  vim.notify("LSP restarted", vim.log.levels.INFO)
+end, { desc = "Restart LSP", silent = true })
 
 -- ── Toggles ───────────────────────────────────────────────────
 map("n", "<leader>uf", function()
