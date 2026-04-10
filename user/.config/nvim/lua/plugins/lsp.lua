@@ -83,10 +83,12 @@ return {
     },
     opts = {
       ensure_installed = {
-        "ts_ls",
         "rust_analyzer",
       },
-      automatic_enable = true,
+      automatic_enable = {
+        -- Don't let mason auto-enable ts_ls; we use tsgo instead
+        exclude = { "ts_ls" },
+      },
     },
     config = function(_, opts)
       require("config.lsp").setup()

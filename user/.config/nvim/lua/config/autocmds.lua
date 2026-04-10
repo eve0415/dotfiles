@@ -37,6 +37,28 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
+-- ── File cleanup on save ─────────────────────────────────────
+-- files.trimTrailingWhitespace, files.trimFinalNewlines, files.insertFinalNewline
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = group,
+  callback = function()
+    local ft_exclude = { "diff", "gitcommit", "markdown" }
+    if vim.tbl_contains(ft_exclude, vim.bo.filetype) then
+      return
+    end
+
+    local view = vim.fn.winsaveview()
+
+    -- Trim trailing whitespace
+    vim.cmd([[silent! %s/\s\+$//e]])
+
+    -- Trim final blank lines, then ensure exactly one final newline
+    vim.cmd([[silent! %s/\($\n\s*\)\+\%$//e]])
+
+    vim.fn.winrestview(view)
+  end,
+})
+
 -- Press q to close help, quickfix, man pages
 vim.api.nvim_create_autocmd("FileType", {
   group = group,

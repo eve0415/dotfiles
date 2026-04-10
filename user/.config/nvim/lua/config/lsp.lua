@@ -56,9 +56,18 @@ function M.setup()
   })
 
   -- ── Per-server settings ───────────────────────────────────
-  vim.lsp.config("ts_ls", {
+
+  -- ── tsgo: native Go-based TypeScript LSP ───────────────────
+  -- Install: npm install -g @typescript/native-preview
+  -- tsgo speaks LSP directly (no wrapper), so settings use
+  -- the same schema as VS Code's typescript.* namespace.
+  vim.lsp.config("tsgo", {
     settings = {
       typescript = {
+        preferences = {
+          preferTypeOnlyAutoImports = true,
+          autoImportFileExcludePatterns = { "vm", "node:vm" },
+        },
         inlayHints = {
           includeInlayParameterNameHints = "all",
           includeInlayFunctionParameterTypeHints = true,
@@ -66,8 +75,13 @@ function M.setup()
           includeInlayPropertyDeclarationTypeHints = true,
           includeInlayFunctionLikeReturnTypeHints = true,
         },
+        implementationsCodeLens = { enabled = true },
+        referencesCodeLens = { enabled = true, showOnAllFunctions = true },
       },
       javascript = {
+        preferences = {
+          autoImportFileExcludePatterns = { "vm", "node:vm" },
+        },
         inlayHints = {
           includeInlayParameterNameHints = "all",
           includeInlayFunctionParameterTypeHints = true,
@@ -75,9 +89,12 @@ function M.setup()
           includeInlayPropertyDeclarationTypeHints = true,
           includeInlayFunctionLikeReturnTypeHints = true,
         },
+        implementationsCodeLens = { enabled = true },
+        referencesCodeLens = { enabled = true, showOnAllFunctions = true },
       },
     },
   })
+  vim.lsp.enable("tsgo")
 
   vim.lsp.config("rust_analyzer", {
     settings = {
@@ -103,6 +120,43 @@ function M.setup()
         workspace = { checkThirdParty = false },
       },
     },
+  })
+
+  -- ── Organize imports on save (editor.codeActionsOnSave) ────
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    group = vim.api.nvim_create_augroup("user_lsp_organize_imports", { clear = true }),
+    pattern = { "*.ts", "*.tsx", "*.js", "*.jsx" },
+    callback = function(ev)
+      -- source.organizeImports
+      local params = vim.lsp.util.make_range_params()
+      params.context = {
+        only = { "source.organizeImports" },
+        diagnostics = {},
+      }
+      local result = vim.lsp.buf_request_sync(ev.buf, "textDocument/codeAction", params, 3000)
+      for _, res in pairs(result or {}) do
+        for _, action in pairs(res.result or {}) do
+          if action.edit then
+            vim.lsp.util.apply_workspace_edit(action.edit, "utf-8")
+          elseif action.command then
+            vim.lsp.buf.execute_command(action.command)
+          end
+        end
+      end
+
+      -- source.addMissingImports (ts_ls specific)
+      params.context.only = { "source.addMissingImports" }
+      result = vim.lsp.buf_request_sync(ev.buf, "textDocument/codeAction", params, 3000)
+      for _, res in pairs(result or {}) do
+        for _, action in pairs(res.result or {}) do
+          if action.edit then
+            vim.lsp.util.apply_workspace_edit(action.edit, "utf-8")
+          elseif action.command then
+            vim.lsp.buf.execute_command(action.command)
+          end
+        end
+      end
+    end,
   })
 
   -- ── On-attach keymaps & features ──────────────────────────
@@ -145,6 +199,11 @@ function M.setup()
             { bufnr = ev.buf }
           )
         end, "Toggle inlay hints")
+      end
+
+      -- Codelens (ts.implementationsCodeLens)
+      if client:supports_method("textDocument/codeLens") then
+        vim.lsp.codelens.enable(true, { bufnr = ev.buf })
       end
 
       -- Document highlight (highlight other occurrences of word under cursor)

@@ -23,6 +23,7 @@ opt.showmode = false
 opt.laststatus = 3
 opt.pumheight = 10
 opt.fillchars = { eob = " " }
+opt.smoothscroll = true -- editor.smoothScrolling
 
 -- Splits (new splits open right/below like VSCode)
 opt.splitright = true
@@ -52,6 +53,8 @@ opt.writebackup = false
 opt.confirm = true
 opt.updatetime = 250
 opt.timeoutlen = 300
+opt.fileformat = "unix"          -- files.eol = "\n"
+opt.fileformats = "unix,dos"     -- prefer unix, accept dos
 
 -- Completion
 opt.completeopt = { "menuone", "noselect", "popup" }
@@ -62,3 +65,16 @@ opt.foldenable = false
 -- Use ripgrep for :grep
 opt.grepprg = "rg --vimgrep --smart-case --hidden --glob !.git"
 opt.grepformat = "%f:%l:%c:%m"
+
+-- ── Filetype overrides ──────────────────────────────────────
+-- [markdown]: tabSize 4, wordWrap on, no quickSuggestions
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    vim.opt_local.tabstop = 4
+    vim.opt_local.softtabstop = 4
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true   -- wrap at word boundaries
+  end,
+})

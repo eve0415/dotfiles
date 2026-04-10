@@ -92,6 +92,13 @@ return {
     },
   },
 
+  -- ── Autotag: linked editing for HTML/JSX tags (editor.linkedEditing) ──
+  {
+    "windwp/nvim-ts-autotag",
+    event = "InsertEnter",
+    opts = {},
+  },
+
   -- ── Colorizer: inline color previews ───────────────────────
   {
     "NvChad/nvim-colorizer.lua",

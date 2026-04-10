@@ -46,7 +46,9 @@ map("n", "<leader>M", "<Cmd>Mason<CR>", { desc = "Mason", silent = true })
 
 -- ── LSP ───────────────────────────────────────────────────────
 map("n", "<leader>cl", function()
-  vim.lsp.stop_client(vim.lsp.get_clients())
+  for _, client in ipairs(vim.lsp.get_clients()) do
+    client:stop()
+  end
   vim.cmd("edit")
   vim.notify("LSP restarted", vim.log.levels.INFO)
 end, { desc = "Restart LSP", silent = true })
