@@ -29,6 +29,19 @@ function M.format(bufnr)
 end
 
 function M.setup()
+  -- ── Suppress tsgo NO_RESULT_CALLBACK_FOUND noise ──────────
+  -- tsgo sometimes responds to already-cancelled requests;
+  -- harmless but noisy. Filter it out of the LSP log.
+  local orig_rpc_err = vim.lsp.rpc.client_errors
+  local notify = vim.notify
+  vim.lsp.handlers["$/logTrace"] = function() end
+  vim.notify = function(msg, level, opts)
+    if type(msg) == "string" and msg:find("NO_RESULT_CALLBACK_FOUND") then
+      return
+    end
+    return notify(msg, level, opts)
+  end
+
   -- ── Diagnostics ───────────────────────────────────────────
   vim.diagnostic.config({
     severity_sort = true,
@@ -75,8 +88,9 @@ function M.setup()
           includeInlayPropertyDeclarationTypeHints = true,
           includeInlayFunctionLikeReturnTypeHints = true,
         },
-        implementationsCodeLens = { enabled = true },
-        referencesCodeLens = { enabled = true, showOnAllFunctions = true },
+        -- TODO: codelens disabled — tsgo crashes Neovim's renderer
+        -- implementationsCodeLens = { enabled = true },
+        -- referencesCodeLens = { enabled = true, showOnAllFunctions = true },
       },
       javascript = {
         preferences = {
@@ -89,8 +103,9 @@ function M.setup()
           includeInlayPropertyDeclarationTypeHints = true,
           includeInlayFunctionLikeReturnTypeHints = true,
         },
-        implementationsCodeLens = { enabled = true },
-        referencesCodeLens = { enabled = true, showOnAllFunctions = true },
+        -- TODO: codelens disabled — tsgo crashes Neovim's renderer
+        -- implementationsCodeLens = { enabled = true },
+        -- referencesCodeLens = { enabled = true, showOnAllFunctions = true },
       },
     },
   })
@@ -127,35 +142,30 @@ function M.setup()
     group = vim.api.nvim_create_augroup("user_lsp_organize_imports", { clear = true }),
     pattern = { "*.ts", "*.tsx", "*.js", "*.jsx" },
     callback = function(ev)
-      -- source.organizeImports
-      local params = vim.lsp.util.make_range_params()
-      params.context = {
-        only = { "source.organizeImports" },
-        diagnostics = {},
-      }
-      local result = vim.lsp.buf_request_sync(ev.buf, "textDocument/codeAction", params, 3000)
-      for _, res in pairs(result or {}) do
-        for _, action in pairs(res.result or {}) do
-          if action.edit then
-            vim.lsp.util.apply_workspace_edit(action.edit, "utf-8")
-          elseif action.command then
-            vim.lsp.buf.execute_command(action.command)
+      local clients = vim.lsp.get_clients({ bufnr = ev.buf, name = "tsgo" })
+      if #clients == 0 then return end
+      local encoding = clients[1].offset_encoding or "utf-16"
+
+      local function run_code_action(action_kind)
+        local params = vim.lsp.util.make_range_params(0, encoding)
+        params.context = {
+          only = { action_kind },
+          diagnostics = {},
+        }
+        local result = vim.lsp.buf_request_sync(ev.buf, "textDocument/codeAction", params, 3000)
+        for _, res in pairs(result or {}) do
+          for _, action in pairs(res.result or {}) do
+            if action.edit then
+              vim.lsp.util.apply_workspace_edit(action.edit, encoding)
+            elseif action.command then
+              vim.lsp.buf.execute_command(action.command)
+            end
           end
         end
       end
 
-      -- source.addMissingImports (ts_ls specific)
-      params.context.only = { "source.addMissingImports" }
-      result = vim.lsp.buf_request_sync(ev.buf, "textDocument/codeAction", params, 3000)
-      for _, res in pairs(result or {}) do
-        for _, action in pairs(res.result or {}) do
-          if action.edit then
-            vim.lsp.util.apply_workspace_edit(action.edit, "utf-8")
-          elseif action.command then
-            vim.lsp.buf.execute_command(action.command)
-          end
-        end
-      end
+      run_code_action("source.organizeImports")
+      run_code_action("source.addMissingImports")
     end,
   })
 
@@ -202,9 +212,11 @@ function M.setup()
       end
 
       -- Codelens (ts.implementationsCodeLens)
-      if client:supports_method("textDocument/codeLens") then
-        vim.lsp.codelens.enable(true, { bufnr = ev.buf })
-      end
+      -- TODO: disabled — tsgo returns out-of-bounds positions that crash
+      -- Neovim's codelens renderer. Re-enable when tsgo stabilizes.
+      -- if client:supports_method("textDocument/codeLens") then
+      --   vim.lsp.codelens.enable(true, { bufnr = ev.buf })
+      -- end
 
       -- Document highlight (highlight other occurrences of word under cursor)
       if client:supports_method("textDocument/documentHighlight") then

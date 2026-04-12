@@ -95,7 +95,7 @@ return {
   -- ── Autotag: linked editing for HTML/JSX tags (editor.linkedEditing) ──
   {
     "windwp/nvim-ts-autotag",
-    event = "InsertEnter",
+    ft = { "html", "xml", "javascript", "javascriptreact", "typescript", "typescriptreact", "svelte", "vue", "astro", "markdown" },
     opts = {},
   },
 
