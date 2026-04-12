@@ -37,6 +37,7 @@ apps = true
 guardian_approval = true
 prevent_idle_sleep = true
 tui_app_server = true
+image_detail_original = true
 
 [plugins."github@openai-curated"]
 enabled = true
