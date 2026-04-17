@@ -8,6 +8,9 @@
     "CLAUDE_CODE_NO_FLICKER": "1",
     "CLAUDE_CODE_EFFORT_LEVEL": "max"
   },
+  "permissions": {
+    "defaultMode": "auto"
+  },
   "enableAllProjectMcpServers": true,
   "hooks": {
     "PreCompact": [
@@ -69,5 +72,6 @@
   "effortLevel": "high",
   "advisorModel": "opus",
   "autoUpdatesChannel": "latest",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true
 }
