@@ -1,5 +1,13 @@
 # PATH
+
 export PATH="/opt/homebrew/bin:$PATH"
+
+# secrets
+
+if [ -f ~/.zsh_secrets ]; then
+    source ~/.zsh_secrets
+fi
+
 
 # history
 HISTSIZE=10000
