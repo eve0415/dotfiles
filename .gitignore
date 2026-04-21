@@ -2,9 +2,10 @@
 !.codex/config.toml
 !.codex/AGENTS.md
 
-.claude/
-!.claude/settings.json
-!.claude/CLAUDE.md
-!.claude/commands/
-!.claude/hooks/
-!.claude/statusline-command.sh
+**/.claude/*
+!**/.claude/settings.json
+!**/.claude/CLAUDE.md
+!**/.claude/skills/
+!**/.claude/commands/
+!**/.claude/hooks/
+!**/.claude/statusline-command.sh
