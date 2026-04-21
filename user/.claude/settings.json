@@ -2,11 +2,13 @@
   "env": {
     "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
     "ENABLE_TOOL_SEARCH": "true",
-    "ENABLE_EXPERIMENTAL_MCP_CLI": "false",
-    "CLAUDE_CODE_HIDE_ACCOUNT_INFO": "true",
+    "IS_DEMO": "true",
     "CLAUDE_CODE_NEW_INIT": "1",
     "CLAUDE_CODE_NO_FLICKER": "1",
-    "CLAUDE_CODE_EFFORT_LEVEL": "max"
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "128000",
+    "MAX_THINKING_TOKENS": "63999",
+    "CLAUDE_CODE_EFFORT_LEVEL": "max",
+    "DISABLE_EXTRA_USAGE_COMMAND": "1"
   },
   "permissions": {
     "allow": [
@@ -50,10 +52,14 @@
       "Bash(gh config list *)",
       "Bash(gh alias list *)",
       "Bash(gh extension list *)",
-      "Bash(gh extension search *)"
+      "Bash(gh extension search *)",
+      "Bash(gh search code *)",
+      "Bash(gh search issues *)",
+      "Bash(gh search prs *)"
     ],
     "defaultMode": "plan"
   },
+  "model": "claude-opus-4-6[1m]",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "PreCompact": [
@@ -112,9 +118,15 @@
       }
     }
   },
+  "alwaysThinkingEnabled": true,
   "effortLevel": "high",
-  "advisorModel": "opus",
+  "advisorModel": "claude-opus-4-7[1m]",
+  "showClearContextOnPlanAccept": true,
   "autoUpdatesChannel": "latest",
+  "plansDirectory": "./.claude/plans",
+  "autoMemoryEnabled": true,
+  "autoMemoryDirectory": "./.claude/memory",
   "skipDangerousModePermissionPrompt": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "useAutoModeDuringPlan": true
 }
