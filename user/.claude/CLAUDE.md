@@ -62,3 +62,10 @@ If no type-checker is configured, state that explicitly instead of claiming succ
     - Re-exports and barrel file entries
     - Test files and mocks
     Do not assume a single grep caught everything.
+
+## Skills & Planning
+
+- Skill descriptions MUST start with "Use when..." and contain zero workflow verbs — no "creates", "gathers", "interviews", "produces", "generates". Description = triggering conditions only. (Why: workflow verbs in descriptions cause agents to follow the description as a shortcut and skip the skill body entirely.)
+- When using superpowers skills (brainstorming, writing-plans), write ALL spec and plan output to the system plan file path (.claude/plans/), not to docs/superpowers/specs/ or docs/superpowers/plans/. Do not create docs/superpowers/ directories.
+- Plans must be fully self-contained — include full context, architecture, research findings, skill references, and review checklist. The user clears conversation context after plan mode; the plan file is the ONLY context the implementer will have.
+- After implementation is complete, review from multiple perspectives before declaring done: code quality (superpowers:requesting-code-review), security (/security-review), simplification (/simplify), CI verification (/verify), and architecture review (feature-dev:code-reviewer) if applicable.
