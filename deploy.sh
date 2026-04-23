@@ -60,6 +60,7 @@ fi
 MODULES=(
   "neovim|Neovim エディタ設定|.config/nvim|.config/nvim|dir"
   "tmux|tmux ターミナルマルチプレクサ設定|.tmux.conf|.tmux.conf|file"
+  "tpm|tmux プラグインマネージャ (TPM, git submodule)|.tmux/plugins/tpm|.tmux/plugins/tpm|dir"
   "zsh|Zsh シェル設定|.zshrc|.zshrc|file"
   "wezterm|WezTerm ターミナル設定|.wezterm.lua|.wezterm.lua|file"
   "git|Git 設定 (config + ignore)|.gitconfig>.gitconfig;.config/git/ignore>.config/git/ignore||files"
@@ -108,7 +109,8 @@ check_status() {
 
   # 内容を比較
   if [[ "$type" == "dir" ]]; then
-    if diff -rq "$source" "$target" &>/dev/null; then
+    # .git / .DS_Store は比較対象外 (submodule の gitdir ポインタや macOS のメタを無視)
+    if diff -rq --exclude=.git --exclude=.DS_Store "$source" "$target" &>/dev/null; then
       echo "synced"      # リポジトリと同一
     else
       echo "modified"    # ローカルで変更あり
@@ -283,6 +285,7 @@ deploy_module() {
       success "${name}: ${method_label}しました (${target})"
     else
       # ディレクトリのコピー: 中のファイルだけを個別にコピー（既存の他ファイルは残す）
+      # .git 以下 (submodule 含む) と .DS_Store は除外
       local copied=0
       while IFS= read -r -d '' src_file; do
         local rel="${src_file#"${source}"/}"
@@ -290,7 +293,7 @@ deploy_module() {
 
         deploy_single_file "$name" "$src_file" "$tgt_file"
         copied=$((copied + 1))
-      done < <(find "$source" -type f ! -name '.DS_Store' -print0)
+      done < <(find "$source" \( -name .git -o -name .DS_Store \) -prune -o -type f -print0)
 
       success "${name}: ${copied} 個のファイルを${method_label}しました"
     fi
