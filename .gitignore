@@ -8,4 +8,5 @@
 !**/.claude/skills/
 !**/.claude/commands/
 !**/.claude/hooks/
+!**/.claude/rules/
 !**/.claude/statusline-command.sh
