@@ -48,8 +48,19 @@ Build a question tree from unknowns identified in Phases 2 and 3.
 - Always provide a recommended answer with reasoning (cite research when relevant)
 - Multiple choice preferred when options are clear, open-ended when not
 - Never ask what the codebase or research already answered
-- Walk every branch of the design tree: technical implementation, UX, tradeoffs, edge cases, dependencies, error handling, testing strategy
+- Walk every branch of the design tree — all of these are mandatory, not suggestions:
+  - Technical implementation (architecture, data flow, APIs)
+  - UX (output format, user interaction, error messages)
+  - Tradeoffs (performance, complexity, maintainability)
+  - Edge cases (failure modes, concurrent access, empty/missing state)
+  - Dependencies (ordering, external systems, backward compatibility)
+  - Error handling (degradation, recovery, user-facing diagnostics)
+  - Testing strategy (unit tests, integration tests, test infrastructure)
+  - **Verification strategy** (how to verify end-to-end after implementation — exact commands, expected output, manual checks)
+  - **Review criteria** (which review dimensions matter — security, performance, accessibility, architecture — and what specifically to check)
+  - **Acceptance criteria** (definition of done — must-haves vs follow-ups, what the user will check before approving)
 - Resolve dependencies between decisions one-by-one
+- A branch is **resolved** when the user has made a concrete decision for every sub-topic in it — no open questions, no "TBD," no deferred choices. If a branch has only one obvious answer confirmed by codebase/research, state the answer and move on (don't ask what's already known).
 - Continue relentlessly until all branches are resolved — do not stop early
 
 ### Phase 5: Design Synthesis
@@ -58,6 +69,7 @@ Build a question tree from unknowns identified in Phases 2 and 3.
 - Lead with your recommendation and explain why
 - Present design section by section, get user approval on each
 - Revise sections the user pushes back on before moving forward
+- The chosen approach feeds the plan's Context and Architecture sections — no separate "Design Alternatives" section in the plan
 
 ### Phase 6: Terminal Choice
 
@@ -79,7 +91,9 @@ Write a self-contained implementation plan to the system plan file using the tem
 
 **Critical:** The user clears conversation context after plan mode. The plan file is the ONLY context the implementer will have. It must include full context, architecture, research findings, all tasks with actual code, and which skills to invoke during implementation and review.
 
-- Self-review before writing: spec coverage, placeholder scan, type/name consistency
+**All template sections are mandatory** — Context, Research Findings, Architecture, Skills Reference, Tasks, Verification, Review Checklist. Do not skip or stub any section. Fill Verification and Review Checklist with project-specific content gathered during the interview (Phase 4 verification/review/acceptance branches), not generic boilerplate.
+
+- Self-review before writing: spec coverage, placeholder scan, type/name consistency, **verify all template sections present with project-specific content**
 - Write to system plan file (`.claude/plans/<name>.md`)
 - ExitPlanMode for user review
 
