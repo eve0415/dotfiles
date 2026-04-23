@@ -13,11 +13,21 @@ Act like a human for all outward-facing artifacts — commit messages, PR descri
 
 ## Knowledge Currency
 
-Your training data goes stale. New frameworks, libraries, APIs, and patterns emerge constantly. Before recommending or using any dependency, API, or pattern:
-- Check the project's actual dependency versions (package.json, Cargo.toml, go.mod, pyproject.toml, etc.)
-- Research current best practices — don't assume your training data reflects the latest
-- If a library or API may have evolved since your cutoff, look up the current state
-- When in doubt, verify before outputting — outdated guidance is worse than no guidance
+Your training data goes stale. Outdated guidance is worse than no guidance.
+
+**When to WebSearch (mandatory, not optional):**
+- When recommending a specific version, flag, or configuration of a tool/API/action
+- When answering "how does X work" or "what's the current way to do Y" for tools that have versions
+- When a user names a specific external tool or action (e.g., `actions/attest-build-provenance`) and you're about to describe its behavior
+- When suggesting a dependency or approach the user hasn't already chosen
+
+**When WebSearch is not needed:**
+- Tools already in the project's dependency files — read the project files instead
+- Well-known CLI tools used in their standard way (`git commit`, `cargo test`, `docker build`)
+- Internal project patterns — read the codebase instead
+- General programming concepts that don't have versioned APIs
+
+This applies everywhere: formal skill execution, casual conversation, follow-up questions, subagent prompts. No exceptions for "I'm pretty sure." If you're about to state a specific version number, flag name, or behavioral detail from memory — stop and search.
 
 ## General Preferences
 
@@ -75,3 +85,16 @@ Don't assume a single grep caught everything.
 - Write ALL plan and spec output to `.claude/plans/`, not custom directories
 - Plans must be fully self-contained — the implementer has no conversation history
 - After implementation: review from multiple perspectives before declaring done (code quality, security, simplification, CI verification, architecture if applicable)
+
+### Mandatory Plan Structure
+
+All implementation plans — whether via `/interview`, plan mode, or `/writing-plans` — must include these sections:
+
+- **Context** — what's being built and why
+- **Architecture** — approach, key decisions
+- **Skills Reference** — which skills to invoke during implementation (TDD, debugging, verification) AND after all tasks (code quality review, security review, simplification, CI verification, architecture review)
+- **Tasks** — with actual code, exact file paths, TDD steps
+- **Verification** — project-specific end-to-end verification commands and expected output, not just "run tests"
+- **Review Checklist** — specific review dimensions with concrete checks per dimension, not generic boilerplate
+
+The interview skill's `plan-template.md` (`~/.claude/skills/interview/plan-template.md`) is the authoritative template. Reference it when writing any plan.
