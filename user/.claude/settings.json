@@ -127,6 +127,7 @@
   "autoMemoryEnabled": true,
   "autoMemoryDirectory": "./.claude/memory",
   "skipDangerousModePermissionPrompt": true,
-  "skipAutoPermissionPrompt": true,
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true,
   "useAutoModeDuringPlan": true
 }
