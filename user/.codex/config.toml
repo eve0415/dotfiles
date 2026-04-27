@@ -12,6 +12,9 @@ sandbox_mode = "workspace-write"
 [projects."/workspaces/*"]
 trust_level = "trusted"
 
+[notice]
+fast_default_opt_out = true
+
 [notice.model_migrations]
 "gpt-5.3-codex" = "gpt-5.4"
 
