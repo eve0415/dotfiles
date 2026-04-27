@@ -129,6 +129,6 @@
   "theme": "auto",
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": true
+  "useAutoModeDuringPlan": true,
+  "skipAutoPermissionPrompt": true
 }
