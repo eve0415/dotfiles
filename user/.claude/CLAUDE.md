@@ -82,6 +82,9 @@ Don't assume a single grep caught everything.
 ## Skills & Planning
 
 - Skill descriptions MUST start with "Use when..." — no workflow verbs in descriptions
+- When a skill layers multiple authority sources, state explicit precedence for all three conflict domains: API surface, file organization, and library/dependency choices (Why: executors encounter conflicts and need a tiebreaker — without one they stall or guess, especially on "which adapter to use" gray areas)
+- Never hardcode dynamic tool output in skills — use the tool command instead (Why: static tables go stale; if a command gives the answer in 2 seconds, use the command)
+- Prohibition sections in skills must explicitly carve out diagnostic/reading activities (Why: executors self-censor reading if the prohibition doesn't explicitly exclude it)
 - Write ALL plan and spec output to `.claude/plans/`, not custom directories
 - Plans must be fully self-contained — the implementer has no conversation history
 - After implementation: review from multiple perspectives before declaring done (code quality, security, simplification, CI verification, architecture if applicable)
