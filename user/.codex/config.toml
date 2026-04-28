@@ -1,16 +1,24 @@
 approval_policy = "on-request"
-personality = "pragmatic"
-model = "gpt-5.5"
-model_reasoning_effort = "high"
-plan_mode_reasoning_effort = "high"
-
-model_context_window = 1000000
-model_auto_compact_token_limit = 950000
 approvals_reviewer = "guardian_subagent"
+model = "gpt-5.5"
+model_auto_compact_token_limit = 950000
+model_context_window = 1000000
+model_reasoning_effort = "high"
+personality = "pragmatic"
+plan_mode_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 
-[projects."/workspaces/*"]
-trust_level = "trusted"
+[features]
+apps = true
+external_migration = true
+guardian_approval = true
+image_detail_original = true
+js_repl = true
+memories = true
+multi_agent = true
+prevent_idle_sleep = true
+tui_app_server = true
+use_linux_sandbox_bwrap = true
 
 [notice]
 fast_default_opt_out = true
@@ -18,34 +26,52 @@ fast_default_opt_out = true
 [notice.model_migrations]
 "gpt-5.3-codex" = "gpt-5.4"
 
+[plugins."github@openai-curated"]
+enabled = true
+
+[plugins."claude-md-management@claude-plugins-official"]
+enabled = true
+
+[plugins."code-simplifier@claude-plugins-official"]
+enabled = true
+
+[plugins."feature-dev@claude-plugins-official"]
+enabled = true
+
+[plugins."superpowers@claude-plugins-official"]
+enabled = true
+
+[plugins."codex@openai-codex"]
+enabled = true
+
+[shell_environment_policy]
+inherit = "core"
+
 [tui]
 status_line = [
-  "model-with-reasoning",
-  "context-remaining",
-  "git-branch",
-  "context-used",
-  "five-hour-limit",
-  "weekly-limit",
-  "context-window-size",
-  "used-tokens",
-  "total-input-tokens",
-  "total-output-tokens",
+    "model-with-reasoning",
+    "context-remaining",
+    "git-branch",
+    "context-used",
+    "five-hour-limit",
+    "weekly-limit",
+    "context-window-size",
+    "used-tokens",
+    "total-input-tokens",
+    "total-output-tokens",
 ]
 
 [tui.model_availability_nux]
-"gpt-5.5" = 1
+"gpt-5.5" = 3
 
-[features]
-js_repl = true
-use_linux_sandbox_bwrap = true
-multi_agent = true
-apps = true
-guardian_approval = true
-prevent_idle_sleep = true
-tui_app_server = true
-image_detail_original = true
-memories = true
-external_migration = true
+[marketplaces.claude-plugins-official]
+last_updated = "2026-04-28T09:19:31Z"
+last_revision = "c5837a2c23b6ae1d89d3ed8212db20984d41b6a1"
+source_type = "git"
+source = "https://github.com/anthropics/claude-plugins-official.git"
 
-[plugins."github@openai-curated"]
-enabled = true
+[marketplaces.openai-codex]
+last_updated = "2026-04-28T09:19:32Z"
+last_revision = "807e03ac9d5aa23bc395fdec8c3767500a86b3cf"
+source_type = "git"
+source = "https://github.com/openai/codex-plugin-cc.git"
