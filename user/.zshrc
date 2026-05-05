@@ -53,6 +53,8 @@ bindkey "^[[B" _history_down
 # external completions
 command -v kubectl >/dev/null 2>&1 && source <(kubectl completion zsh)
 command -v docker >/dev/null 2>&1 && source <(docker completion zsh)
+command -v cella >/dev/null 2>&1 && source <(cella completion zsh)
+command -v gh >/dev/null 2>&1 && source <(gh completion zsh)
 
 # ---- plugins ----
 
