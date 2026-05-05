@@ -12,7 +12,7 @@ fi
 # history
 HISTSIZE=10000
 SAVEHIST=10000
-setopt share_history
+setopt inc_append_history
 setopt hist_ignore_all_dups
 setopt auto_cd
 setopt prompt_subst
@@ -54,7 +54,7 @@ bindkey "^[[B" _history_down
 command -v kubectl >/dev/null 2>&1 && source <(kubectl completion zsh)
 command -v docker >/dev/null 2>&1 && source <(docker completion zsh)
 command -v cella >/dev/null 2>&1 && source <(cella completion zsh)
-command -v gh >/dev/null 2>&1 && source <(gh completion zsh)
+command -v gh >/dev/null 2>&1 && source <(gh completion -s zsh)
 
 # ---- plugins ----
 
