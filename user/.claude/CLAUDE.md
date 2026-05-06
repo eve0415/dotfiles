@@ -70,6 +70,8 @@ Don't assume a single grep caught everything.
 - Independent branches per feature, rebase before PR
 - No merge commits on main
 - Breaking changes are acceptable when they improve the codebase
+- After any install/update command or package manifest edit (package.json, Cargo.toml, pyproject.toml, etc.), always stage and commit the lock file (pnpm-lock.yaml, package-lock.json, yarn.lock, Cargo.lock, bun.lock, uv.lock, poetry.lock, go.sum, Gemfile.lock) in the same commit
+- Never leave lock file changes unstaged — if a dependency changed, the lock file is part of that change
 
 ## Testing Philosophy
 
