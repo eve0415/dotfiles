@@ -8,6 +8,7 @@ local config = wezterm.config_builder()
 
 config.font = wezterm.font_with_fallback({
 	"JetBrains Mono",
+	"Hiragino Sans"
 })
 
 config.font_size = 14.0
