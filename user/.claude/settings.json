@@ -61,6 +61,16 @@
   "model": "claude-opus-4-6[1m]",
   "enableAllProjectMcpServers": true,
   "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.claude/hooks/gh-redirect.sh"
+          }
+        ]
+      }
+    ],
     "PreCompact": [
       {
         "hooks": [
@@ -94,7 +104,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash $HOME/.claude/statusline-command.sh"
+    "command": "bash $HOME/.claude/hooks/statusline-command.sh"
   },
   "enabledPlugins": {
     "claude-md-management@claude-plugins-official": true,
