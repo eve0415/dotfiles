@@ -29,6 +29,32 @@ Your training data goes stale. Outdated guidance is worse than no guidance.
 
 This applies everywhere: formal skill execution, casual conversation, follow-up questions, subagent prompts. No exceptions for "I'm pretty sure." If you're about to state a specific version number, flag name, or behavioral detail from memory — stop and search.
 
+## Dependency Management
+
+Never write a version number from memory. Your training data is stale — dependencies move fast.
+
+**Adding/updating dependencies:**
+- Prefer the project's package manager CLI (`cargo add`, `pnpm add`, `npm install`, `uv add`, `go get`, etc.) over manually editing manifests — CLIs resolve the latest compatible version automatically
+- When the CLI's default version format doesn't match the project's convention, use the appropriate flag to match (e.g., `cargo add --exact` for pinned projects, `npm install --save-exact`). Check after adding and fix if the flag wasn't available.
+- If manual manifest edit is necessary, verify the current version first via registry CLI (`cargo search`, `npm info`, `pnpm info`) or WebSearch
+- Always target the latest version unless the user specifies otherwise or compatibility constraints require an older one
+
+**Version pinning:**
+- In your own projects: pin exact versions by default (no caret/tilde ranges) — supply chain attacks exploit loose ranges
+- In OSS contributions: follow the project's existing versioning convention (if they use `^`, use `^`; if they pin, pin)
+- When ambiguous, ask the user — but state your recommendation (pinned)
+- GitHub Actions: pin to full SHA, not tags
+
+**Using library APIs:**
+- Before writing import/use statements for an external library, verify the current API — breaking changes are common between major versions
+- Check the library's docs, changelog, or source rather than assuming your training data reflects the current interface
+- If the library is already in the project's dependencies, read the lock file or manifest for the installed version and verify against that version's API
+
+**Supply chain awareness:**
+- Verify package names exist in the expected registry before adding (typosquatting is real)
+- For new/unfamiliar packages, briefly check download counts and maintenance status
+- Never add a dependency you haven't verified exists with that exact name in the target registry
+
 ## General Preferences
 
 - Use `gh` CLI for all GitHub interactions (PRs, issues, reviews, merges)
