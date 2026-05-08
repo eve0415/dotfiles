@@ -1,131 +1,170 @@
 # Global Directives
 
-## Interaction Style
+## Interaction
 
-Be brutally honest. Challenge my thinking, question assumptions, expose blind spots. Don't validate, soften, or flatter.
-If I'm fooling myself, avoiding something uncomfortable, or making excuses — call it out with the opportunity cost. Show me where I'm underestimating effort or playing small. Then give a precise, prioritized plan to fix it.
+Be brutally honest. Challenge my thinking, question assumptions, expose blind spots. Don't validate, soften, or flatter. If I'm fooling myself or making excuses — call it out with the opportunity cost, then give a precise plan to fix it.
 
 Keep responses concise. Don't summarize what you just did — I can read diffs. Present options with tradeoffs when exploring; implement when asked.
 
-## Human Output
+Act like a human for all outward-facing artifacts — commit messages, PR descriptions, branch names, comments, documentation. Short, natural, conversational. No multi-paragraph essays or systematic reports unless explicitly asked.
 
-Act like a human for all outward-facing artifacts — commit messages, PR descriptions, branch names, comments, and documentation. Write short, natural commit messages, not multi-paragraph essays. PR descriptions should be conversational, not systematic reports. Unless I explicitly ask for detailed or formal output, default to what a human developer would naturally write.
+## Design Philosophy
 
-## Knowledge Currency
+**Extensibility by default.** Every implementation must be designed for future expansion — APIs, interfaces, types, data structures, all of it. This is non-negotiable and applies to all work, regardless of stated scope or finality.
+
+Today's best practice is tomorrow's anti-pattern. Industrial standards evolve, technology advances, requirements change. Code that can't accommodate growth gets rewritten from scratch. Design as if everything will change, because it will.
+
+This is about structural choices at boundaries, not speculative features:
+- **Do:** Use an enum where a boolean would suffice today — a third state is one requirement change away
+- **Do:** Define a trait/interface at a module boundary, even with one implementation now
+- **Do:** Structure data for additive changes — adding a field shouldn't break existing consumers
+- **Don't:** Build features no one requested. Create abstractions for hypothetical use cases. Over-engineer.
+
+This principle is silent — don't surface it, don't discuss it. Just apply it to every design decision.
+
+## Research & Dependencies
+
+### Knowledge Currency
 
 Your training data goes stale. Outdated guidance is worse than no guidance.
 
-**When to WebSearch (mandatory, not optional):**
-- When recommending a specific version, flag, or configuration of a tool/API/action
-- When answering "how does X work" or "what's the current way to do Y" for tools that have versions
-- When a user names a specific external tool or action (e.g., `actions/attest-build-provenance`) and you're about to describe its behavior
-- When suggesting a dependency or approach the user hasn't already chosen
+**WebSearch is mandatory when:**
+- Recommending a specific version, flag, or configuration
+- Answering "how does X work" for tools with versions
+- A user names a specific external tool or action and you're about to describe its behavior
+- Suggesting a dependency or approach the user hasn't already chosen
 
-**When WebSearch is not needed:**
-- Tools already in the project's dependency files — read the project files instead
-- Well-known CLI tools used in their standard way (`git commit`, `cargo test`, `docker build`)
-- Internal project patterns — read the codebase instead
-- General programming concepts that don't have versioned APIs
+**Not needed when:**
+- Tools already in the project's dependency files — read the project instead
+- Well-known CLI tools in standard usage (`git commit`, `cargo test`)
+- Internal project patterns — read the codebase
+- General programming concepts without versioned APIs
 
-This applies everywhere: formal skill execution, casual conversation, follow-up questions, subagent prompts. No exceptions for "I'm pretty sure." If you're about to state a specific version number, flag name, or behavioral detail from memory — stop and search.
+This applies everywhere — formal skill execution, casual conversation, follow-up questions, subagent prompts. No exceptions for "I'm pretty sure." If you're about to state a specific version number, flag name, or behavioral detail from memory — stop and search.
 
-## Dependency Management
+### Dependency Management
 
-Never write a version number from memory. Your training data is stale — dependencies move fast.
+Never write a version number from memory.
 
-**Adding/updating dependencies:**
-- Prefer the project's package manager CLI (`cargo add`, `pnpm add`, `npm install`, `uv add`, `go get`, etc.) over manually editing manifests — CLIs resolve the latest compatible version automatically
-- When the CLI's default version format doesn't match the project's convention, use the appropriate flag to match (e.g., `cargo add --exact` for pinned projects, `npm install --save-exact`). Check after adding and fix if the flag wasn't available.
-- If manual manifest edit is necessary, verify the current version first via registry CLI (`cargo search`, `npm info`, `pnpm info`) or WebSearch
-- Always target the latest version unless the user specifies otherwise or compatibility constraints require an older one
+**Adding/updating:**
+- Prefer package manager CLI (`cargo add`, `pnpm add`, etc.) over manual manifest edits
+- Match the project's version format with appropriate flags (e.g., `cargo add --exact` for pinned projects). Check after adding and fix if the flag wasn't available
+- If manual edit is necessary, verify via registry CLI or WebSearch first
+- Always target latest unless constraints require otherwise
 
 **Version pinning:**
-- In your own projects: pin exact versions by default (no caret/tilde ranges) — supply chain attacks exploit loose ranges
-- In OSS contributions: follow the project's existing versioning convention (if they use `^`, use `^`; if they pin, pin)
-- When ambiguous, ask the user — but state your recommendation (pinned)
+- Own projects: pin exact versions (no caret/tilde ranges) — supply chain attacks exploit loose ranges
+- OSS contributions: follow the project's convention (if they use `^`, use `^`; if they pin, pin)
+- When ambiguous, ask — but recommend pinned
 - GitHub Actions: pin to full SHA, not tags
 
 **Using library APIs:**
-- Before writing import/use statements for an external library, verify the current API — breaking changes are common between major versions
-- Check the library's docs, changelog, or source rather than assuming your training data reflects the current interface
-- If the library is already in the project's dependencies, read the lock file or manifest for the installed version and verify against that version's API
+- Verify current API before writing import/use statements — breaking changes between major versions are common
+- Check docs, changelog, or source rather than trusting training data
+- If already in project deps, read the lock file for installed version and verify against that version's API
 
-**Supply chain awareness:**
-- Verify package names exist in the expected registry before adding (typosquatting is real)
-- For new/unfamiliar packages, briefly check download counts and maintenance status
-- Never add a dependency you haven't verified exists with that exact name in the target registry
+**Supply chain:**
+- Verify package names exist in expected registry before adding (typosquatting is real)
+- Check download counts and maintenance status for unfamiliar packages
+- Never add unverified dependencies
 
-## General Preferences
+## Code Practices
 
-- Use `gh` CLI for all GitHub interactions (PRs, issues, reviews, merges)
-- Prefer `.yaml` over `.yml` for file extensions
-- Sign all commits. Never change git author or signing options. If signing fails, retry — the permission prompt may appear on the user's side. Only stop after repeated failures.
+**Dead code first:** Before structural refactors on files >300 LOC, remove dead code. Commit cleanup separately before the real work.
 
-## Pre-Work
+**Phased execution:** Break multi-file refactors into phases of ≤5 files. Complete, verify, get approval before each next phase.
 
-- **Dead code first**: Before structural refactors on files >300 LOC, remove dead code (unused imports, exports, variables, debug logs). Commit cleanup separately before the real work.
-- **Phased execution**: Break multi-file refactors into phases of ≤5 files. Complete, verify, and get approval before each next phase.
+**Senior dev standard:** Don't settle for "simplest approach" when architecture is flawed, state is duplicated, or patterns are inconsistent. Ask: "What would a perfectionist senior dev reject in code review?" Fix it.
 
-## Code Quality
+**Verification before completion:** Never report done without running the project's type-checker and linter, fixing ALL errors. If none configured, state that explicitly.
 
-- **Senior dev standard**: Don't settle for "simplest approach" when architecture is flawed, state is duplicated, or patterns are inconsistent. Ask: "What would a perfectionist senior dev reject in code review?" Fix it.
-- **Verification before completion**: Never report done without running the project's type-checker and linter, and fixing ALL resulting errors. If none configured, state that explicitly instead of claiming success.
+### Context Safety
 
-## Context Safety
+- Re-read files before editing after 10+ messages — auto-compaction destroys context silently
+- Files over 500 LOC: read in chunks with offset/limit
+- If search returns suspiciously few results, re-run narrower — state when you suspect truncation
+- Re-read after every 3 edits to the same file — Edit fails silently on mismatch
 
-- **Re-read before editing**: After 10+ messages, re-read files before editing. Auto-compaction silently destroys context — editing against stale state causes silent Edit failures.
-- **Large file chunking**: Files over 500 LOC must be read in chunks with offset/limit. A single read may not capture the whole file.
-- **Truncation awareness**: If a search returns suspiciously few results, re-run with narrower scope. State when you suspect truncation.
-- **Edit verification**: Re-read after every 3 edits to the same file. The Edit tool fails silently when old_string doesn't match.
+### Rename & Refactor Safety
 
-## Rename & Refactor Safety
-
-You have grep, not an AST. When renaming or changing any identifier, search separately for:
+You have grep, not an AST. When renaming any identifier, search separately for:
 - Direct calls, references, and type-level uses
-- String literals and template strings containing the name
-- Re-exports, barrel files, and module entry points
-- Test files, mocks, and fixtures
+- String literals and template strings
+- Re-exports, barrel files, module entry points
+- Test files, mocks, fixtures
 - Language-specific dynamic references (macros, reflection, codegen)
 
 Don't assume a single grep caught everything.
 
-## Git Workflow
+## Workflow
+
+### Git
 
 - Conventional commits: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`, `test:`
 - Tiny atomic commits — one concern per commit
-- Independent branches per feature, rebase before PR
-- No merge commits on main
+- Independent branches per feature, rebase before PR, no merge commits on main
 - Breaking changes are acceptable when they improve the codebase
-- After any install/update command or package manifest edit (package.json, Cargo.toml, pyproject.toml, etc.), always stage and commit the lock file (pnpm-lock.yaml, package-lock.json, yarn.lock, Cargo.lock, bun.lock, uv.lock, poetry.lock, go.sum, Gemfile.lock) in the same commit
+- After any install/update or manifest edit, always stage and commit the lock file (`Cargo.lock`, `pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`, `bun.lock`, `uv.lock`, `poetry.lock`, `go.sum`, `Gemfile.lock`) in the same commit
 - Never leave lock file changes unstaged — if a dependency changed, the lock file is part of that change
+- Sign all commits. Never change git author or signing options. Retry on failure — permission prompt may appear on the user's side. Only stop after repeated failures
+- Use `gh` CLI for all GitHub interactions
 
-## Testing Philosophy
+### Testing
 
-- Follow the language's test location convention (colocated in Rust/Go, `tests/` in Python, `__tests__/` in JS — don't impose one style across languages)
-- Add unit tests when implementing new code
-- Add regression tests when fixing bugs
+- Follow the language's test location convention (colocated in Rust/Go, `tests/` in Python, `__tests__/` in JS)
+- Add unit tests when implementing new code, regression tests when fixing bugs
 - Use project-specific test utilities — don't reinvent what exists
 - Prefer real system integration tests over mocks that diverge from production
+
+### General
+
+- Prefer `.yaml` over `.yml`
 
 ## Skills & Planning
 
 - Skill descriptions MUST start with "Use when..." — no workflow verbs in descriptions
-- When a skill layers multiple authority sources, state explicit precedence for all three conflict domains: API surface, file organization, and library/dependency choices (Why: executors encounter conflicts and need a tiebreaker — without one they stall or guess, especially on "which adapter to use" gray areas)
-- Never hardcode dynamic tool output in skills — use the tool command instead (Why: static tables go stale; if a command gives the answer in 2 seconds, use the command)
-- Prohibition sections in skills must explicitly carve out diagnostic/reading activities (Why: executors self-censor reading if the prohibition doesn't explicitly exclude it)
-- Write ALL plan and spec output to `.claude/plans/`, not custom directories
+- State explicit precedence for conflict domains (API surface, file organization, library/dependency choices) when a skill layers multiple authority sources (Why: executors stall or guess without a tiebreaker)
+- Never hardcode dynamic tool output in skills — use the tool command (Why: static tables go stale; if a command gives the answer in 2 seconds, use it)
+- Prohibition sections must carve out diagnostic/reading activities (Why: executors self-censor reading if the prohibition doesn't explicitly exclude it)
+- Write all plan and spec output to `.claude/plans/`
 - Plans must be fully self-contained — the implementer has no conversation history
-- After implementation: review from multiple perspectives before declaring done (code quality, security, simplification, CI verification, architecture if applicable)
+- After implementation: review using `code-review:code-review` (code quality), `security-review` (security), `simplify` (simplification), `verify` (CI verification)
 
 ### Mandatory Plan Structure
 
-All implementation plans — whether via `/interview`, plan mode, or `/writing-plans` — must include these sections:
+All plans must include:
 
 - **Context** — what's being built and why
 - **Architecture** — approach, key decisions
-- **Skills Reference** — which skills to invoke during implementation (TDD, debugging, verification) AND after all tasks (code quality review, security review, simplification, CI verification, architecture review)
+- **Skills Reference** — exact skill names from the catalog below. List which to invoke during implementation AND which after all tasks for review
 - **Tasks** — with actual code, exact file paths, TDD steps
 - **Verification** — project-specific end-to-end verification commands and expected output, not just "run tests"
 - **Review Checklist** — specific review dimensions with concrete checks per dimension, not generic boilerplate
 
 The interview skill's `plan-template.md` (`~/.claude/skills/interview/plan-template.md`) is the authoritative template. Reference it when writing any plan.
+
+### Skill Catalog
+
+Use exact names when referencing skills in plans. Never use generic descriptions like "code quality review" — use the skill name.
+
+**Pre-implementation:**
+- `interview` — requirements elicitation when specs are unclear
+- `spec-research` — research devcontainer spec / official CLI behavior
+- `write-spec` — create official project documentation
+**During implementation:**
+- `feature-dev:feature-dev` — guided feature development with architecture focus
+- `verify` — run full CI verification suite locally
+
+**Post-implementation review (invoke after every non-trivial task):**
+- `code-review:code-review` — code quality review
+- `security-review` — security review of pending changes
+- `simplify` — review changed code for reuse, quality, efficiency
+- `verify` — CI verification (format, lint, test, snapshots)
+- `empirical-prompt-tuning` — validate prompt/skill changes with bias-free executor
+
+**Maintenance:**
+- `claude-md-management:claude-md-improver` — audit and improve CLAUDE.md files
+- `claude-md-management:revise-claude-md` — update CLAUDE.md with session learnings
+- `retrospective-codify` — codify trial-and-error learnings into rules or skills
+- `update-config` — configure hooks, permissions, env vars in settings.json
+- `fewer-permission-prompts` — optimize permission allowlists

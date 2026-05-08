@@ -124,7 +124,15 @@
       "source": {
         "source": "github",
         "repo": "openai/codex-plugin-cc"
-      }
+      },
+      "autoUpdate": true
+    },
+    "knowledge-work-plugins": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/anthropics/knowledge-work-plugins.git"
+      },
+      "autoUpdate": true
     }
   },
   "alwaysThinkingEnabled": true,
