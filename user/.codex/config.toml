@@ -69,18 +69,9 @@ enabled = true
 inherit = "core"
 
 [tui]
-status_line = [
-    "model-with-reasoning",
-    "context-remaining",
-    "git-branch",
-    "context-used",
-    "five-hour-limit",
-    "weekly-limit",
-    "context-window-size",
-    "used-tokens",
-    "total-input-tokens",
-    "total-output-tokens",
-]
+status_line = ["model-with-reasoning", "context-remaining", "git-branch", "context-used", "five-hour-limit", "weekly-limit", "context-window-size", "used-tokens", "total-input-tokens", "total-output-tokens", "pull-request-number", "run-state", "task-progress"]
+terminal_title = ["activity", "project-name", "run-state", "thread-title"]
+status_line_use_colors = true
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4
