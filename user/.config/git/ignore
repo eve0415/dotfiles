@@ -2,7 +2,7 @@
 .DS_Store
 
 # Claude
-.claude/*.local.*
-.claude/memory/
-.claude/plans/
-.claude/worktrees/
+**/.claude/*.local.*
+**/.claude/memory/
+**/.claude/plans/
+**/.claude/worktrees/
