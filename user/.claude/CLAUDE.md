@@ -22,9 +22,7 @@ This is about structural choices at boundaries, not speculative features:
 
 This principle is silent — don't surface it, don't discuss it. Just apply it to every design decision.
 
-## Research & Dependencies
-
-### Knowledge Currency
+## Knowledge Currency
 
 Your training data goes stale. Outdated guidance is worse than no guidance.
 
@@ -42,37 +40,9 @@ Your training data goes stale. Outdated guidance is worse than no guidance.
 
 This applies everywhere — formal skill execution, casual conversation, follow-up questions, subagent prompts. No exceptions for "I'm pretty sure." If you're about to state a specific version number, flag name, or behavioral detail from memory — stop and search.
 
-### Dependency Management
-
-Never write a version number from memory.
-
-**Adding/updating:**
-- Prefer package manager CLI (`cargo add`, `pnpm add`, etc.) over manual manifest edits
-- Match the project's version format with appropriate flags (e.g., `cargo add --exact` for pinned projects). Check after adding and fix if the flag wasn't available
-- If manual edit is necessary, verify via registry CLI or WebSearch first
-- Always target latest unless constraints require otherwise
-
-**Version pinning:**
-- Own projects: pin exact versions (no caret/tilde ranges) — supply chain attacks exploit loose ranges
-- OSS contributions: follow the project's convention (if they use `^`, use `^`; if they pin, pin)
-- When ambiguous, ask — but recommend pinned
-- GitHub Actions: pin to full SHA, not tags
-
-**Using library APIs:**
-- Verify current API before writing import/use statements — breaking changes between major versions are common
-- Check docs, changelog, or source rather than trusting training data
-- If already in project deps, read the lock file for installed version and verify against that version's API
-
-**Supply chain:**
-- Verify package names exist in expected registry before adding (typosquatting is real)
-- Check download counts and maintenance status for unfamiliar packages
-- Never add unverified dependencies
-
 ## Code Practices
 
-**Dead code first:** Before structural refactors on files >300 LOC, remove dead code. Commit cleanup separately before the real work.
-
-**Phased execution:** Break multi-file refactors into phases of ≤5 files. Complete, verify, get approval before each next phase.
+**Dead code first / phased execution:** Before structural refactors on files >300 LOC, remove dead code first (separate commit). Break multi-file refactors into phases of ≤5 files — complete, verify, get approval before each next phase.
 
 **Senior dev standard:** Don't settle for "simplest approach" when architecture is flawed, state is duplicated, or patterns are inconsistent. Ask: "What would a perfectionist senior dev reject in code review?" Fix it.
 
@@ -80,23 +50,18 @@ Never write a version number from memory.
 
 ### Context Safety
 
-- Re-read files before editing after 10+ messages — auto-compaction destroys context silently
-- Files over 500 LOC: read in chunks with offset/limit
-- If search returns suspiciously few results, re-run narrower — state when you suspect truncation
-- Re-read after every 3 edits to the same file — Edit fails silently on mismatch
-
-### Rename & Refactor Safety
-
-You have grep, not an AST. When renaming any identifier, search separately for:
-- Direct calls, references, and type-level uses
-- String literals and template strings
-- Re-exports, barrel files, module entry points
-- Test files, mocks, fixtures
-- Language-specific dynamic references (macros, reflection, codegen)
-
-Don't assume a single grep caught everything.
+- Re-read files before editing after 10+ messages or every 3 edits to the same file — auto-compaction and Edit mismatches lose changes silently
+- Files over 500 LOC: read in chunks. Suspiciously few search results: re-run narrower and state the suspicion
 
 ## Workflow
+
+### Planning & Execution
+
+- **Explore → Plan → Implement → Verify.** Separate research from coding. Use plan mode for non-trivial changes.
+- Use `/goal` for substantial tasks with a verifiable end state — migrations, design doc implementations, multi-file refactors. Write conditions with: one measurable outcome, a stated check command, constraints that must hold.
+- Specify tasks upfront with intent, constraints, acceptance criteria, and relevant file locations. One well-specified prompt outperforms five rounds of back-and-forth.
+- Spawn subagents explicitly for investigation, parallel file processing, and independent review. Don't expect automatic parallelization — request it.
+- Delegate codebase research to subagents to keep the main context clean for implementation.
 
 ### Git
 
@@ -122,24 +87,23 @@ Don't assume a single grep caught everything.
 
 ## Skills & Planning
 
-- Skill descriptions MUST start with "Use when..." — no workflow verbs in descriptions
-- State explicit precedence for conflict domains (API surface, file organization, library/dependency choices) when a skill layers multiple authority sources (Why: executors stall or guess without a tiebreaker)
-- Never hardcode dynamic tool output in skills — use the tool command (Why: static tables go stale; if a command gives the answer in 2 seconds, use it)
-- Prohibition sections must carve out diagnostic/reading activities (Why: executors self-censor reading if the prohibition doesn't explicitly exclude it)
-- Write all plan and spec output to `.claude/plans/`
-- Plans must be fully self-contained — the implementer has no conversation history
+- Skill descriptions MUST start with "Use when..." — state explicit precedence when layering authority sources, never hardcode dynamic tool output, carve out diagnostic/reading from prohibition sections
+- Write all plan and spec output to `.claude/plans/` — plans must be fully self-contained (the implementer has no conversation history)
 - After implementation: review using `code-review:code-review` (code quality), `security-review` (security), `simplify` (simplification), `verify` (CI verification)
 
 ### Mandatory Plan Structure
 
 All plans must include:
 
+- **Goal** — verifiable end state with a ready-to-paste `/goal` condition
 - **Context** — what's being built and why
+- **Research Findings** — external research, modern approaches, known pitfalls
 - **Architecture** — approach, key decisions
+- **Design Rationale** — alternatives considered, why each was rejected, why chosen approach wins
 - **Skills Reference** — exact skill names from the catalog below. List which to invoke during implementation AND which after all tasks for review
-- **Tasks** — with actual code, exact file paths, TDD steps
-- **Verification** — project-specific end-to-end verification commands and expected output, not just "run tests"
-- **Review Checklist** — specific review dimensions with concrete checks per dimension, not generic boilerplate
+- **Implementation Phases** — grouped tasks with dependency graphs, per-phase verification gates, actual code and exact file paths
+- **Verification** — project-specific end-to-end verification commands and expected output
+- **Review Checklist** — specific review dimensions with concrete checks per dimension
 
 The interview skill's `plan-template.md` (`~/.claude/skills/interview/plan-template.md`) is the authoritative template. Reference it when writing any plan.
 
@@ -152,15 +116,21 @@ Use exact names when referencing skills in plans. Never use generic descriptions
 - `spec-research` — research devcontainer spec / official CLI behavior
 - `write-spec` — create official project documentation
 **During implementation:**
+- `superpowers:test-driven-development` — TDD workflow (test first, fail, implement, pass)
+- `superpowers:systematic-debugging` — root cause debugging when tests fail
+- `superpowers:verification-before-completion` — verify before claiming done
 - `feature-dev:feature-dev` — guided feature development with architecture focus
 - `verify` — run full CI verification suite locally
 
 **Post-implementation review (invoke after every non-trivial task):**
-- `code-review:code-review` — code quality review
+- `code-review:code-review` — code quality review (dispatches `feature-dev:code-reviewer` subagent)
 - `security-review` — security review of pending changes
 - `simplify` — review changed code for reuse, quality, efficiency
 - `verify` — CI verification (format, lint, test, snapshots)
 - `empirical-prompt-tuning` — validate prompt/skill changes with bias-free executor
+
+**Completion:**
+- `superpowers:finishing-a-development-branch` — branch completion (merge, PR, keep, or discard)
 
 **Maintenance:**
 - `claude-md-management:claude-md-improver` — audit and improve CLAUDE.md files

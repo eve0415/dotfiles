@@ -5,7 +5,7 @@ description: Use when requirements are unclear or incomplete for a new feature, 
 
 # Interview
 
-Systematic requirements elicitation through codebase research, external research, and relentless one-question-at-a-time depth probing. Produces either an implementation plan (system plan file) or official documentation (git-tracked spec), or both.
+Goal-driven requirements elicitation through codebase research, external research, and relentless depth probing. Defines a verifiable end state first, then works backward to requirements. Produces an implementation plan with phased tasks and a ready-to-paste `/goal` condition, or official documentation, or both.
 
 ## When to Use
 
@@ -39,16 +39,30 @@ Before asking any questions:
 - Identify known pitfalls, deprecated patterns, emerging alternatives
 - Present a brief summary of key findings to the user before starting questions
 
-### Phase 4: Interview Loop
+### Phase 4: Goal Definition
 
-Build a question tree from unknowns identified in Phases 2 and 3.
+Collaboratively define the verifiable end state with the user. Research findings from Phases 2-3 inform what's achievable.
+
+- Ask the user: "What does done look like?" Frame it as a measurable outcome.
+- Draft an initial `/goal` condition (≤4000 chars) with:
+  - One measurable end state (a test result, build exit code, file state)
+  - A stated check (how to prove completion — e.g., "`cargo test` exits 0")
+  - Constraints (what must NOT change — e.g., "no existing tests broken")
+- Present the draft `/goal` condition to the user for refinement
+- The goal shapes which interview branches get priority and depth
+
+**Output:** A prose goal description AND a draft `/goal` condition. Both will be refined as technical decisions resolve in Phase 5.
+
+### Phase 5: Interview Loop
+
+Build a question tree working backward from the goal. Walk branches in order of relevance to the goal — branches that directly impact goal achievement come first.
 
 **Rules:**
 - One question at a time via AskUserQuestion (never batch multiple questions)
 - Always provide a recommended answer with reasoning (cite research when relevant)
 - Multiple choice preferred when options are clear, open-ended when not
 - Never ask what the codebase or research already answered
-- Walk every branch of the design tree — all of these are mandatory, not suggestions:
+- Walk every branch of the design tree — all mandatory, ordered by goal relevance:
   - Technical implementation (architecture, data flow, APIs)
   - UX (output format, user interaction, error messages)
   - Tradeoffs (performance, complexity, maintainability)
@@ -56,6 +70,7 @@ Build a question tree from unknowns identified in Phases 2 and 3.
   - Dependencies (ordering, external systems, backward compatibility)
   - Error handling (degradation, recovery, user-facing diagnostics)
   - Testing strategy (unit tests, integration tests, test infrastructure)
+  - **Goal condition** (refine the /goal condition as decisions resolve — update the check command, constraints, and end state to reflect technical choices made)
   - **Verification strategy** (how to verify end-to-end after implementation — exact commands, expected output, manual checks)
   - **Review criteria** (which review dimensions matter — security, performance, accessibility, architecture — and what specifically to check)
   - **Acceptance criteria** (definition of done — must-haves vs follow-ups, what the user will check before approving)
@@ -63,39 +78,40 @@ Build a question tree from unknowns identified in Phases 2 and 3.
 - A branch is **resolved** when the user has made a concrete decision for every sub-topic in it — no open questions, no "TBD," no deferred choices. If a branch has only one obvious answer confirmed by codebase/research, state the answer and move on (don't ask what's already known).
 - Continue relentlessly until all branches are resolved — do not stop early
 
-### Phase 5: Design Synthesis
+### Phase 6: Design Synthesis
 
 - Propose 2-3 approaches with trade-offs, informed by research findings
 - Lead with your recommendation and explain why
+- For each alternative: 1-2 sentences on why it was rejected (this feeds the plan's Design Rationale section)
 - Present design section by section, get user approval on each
 - Revise sections the user pushes back on before moving forward
-- The chosen approach feeds the plan's Context and Architecture sections — no separate "Design Alternatives" section in the plan
 
-### Phase 6: Terminal Choice
+### Phase 7: Terminal Choice
 
 Ask the user via AskUserQuestion:
-- **Option A: "Proceed to implementation"** (Recommended) — write implementation plan
-- **Option B: "Write official spec"** — produce git-tracked documentation
-- **Option C: "Both"** — write spec first, then implementation plan
+- **Option A: "Implement with /goal"** (Recommended) — Write implementation plan, then ExitPlanMode with the `/goal` condition so the implementer can run autonomously. The exit message includes: the plan file path, the finalized `/goal` condition ready to paste, and a note that the user can run `/goal <condition>` to start.
+- **Option B: "Implement manually"** — Write implementation plan, ExitPlanMode normally. The implementer works through phases step by step.
+- **Option C: "Write official spec"** — Produce git-tracked documentation.
+- **Option D: "Both spec and implementation"** — Write spec first, then implementation plan.
 
-### Phase 7: Write Spec (if Option B or C)
+### Phase 8: Write Spec (if Option C or D)
 
 - Ask: audience (developer / end-user / both) and output path (default: `docs/specs/<name>.md`)
 - Format for the chosen audience
 - Write the git-tracked spec file
-- If Option C, continue to Phase 8
+- If Option D, continue to Phase 9
 
-### Phase 8: Implementation Plan (if Option A or C)
+### Phase 9: Implementation Plan (if Option A, B, or D)
 
 Write a self-contained implementation plan to the system plan file using the template in `plan-template.md` in this skill's directory.
 
-**Critical:** The user clears conversation context after plan mode. The plan file is the ONLY context the implementer will have. It must include full context, architecture, research findings, all tasks with actual code, and which skills to invoke during implementation and review.
+**Critical:** The user clears conversation context after plan mode. The plan file is the ONLY context the implementer will have. It must include full context, architecture, research findings, the /goal condition, design rationale, all tasks organized into phases with actual code, and which skills to invoke during implementation and review.
 
-**All template sections are mandatory** — Context, Research Findings, Architecture, Skills Reference, Tasks, Verification, Review Checklist. Do not skip or stub any section. Fill Verification and Review Checklist with project-specific content gathered during the interview (Phase 4 verification/review/acceptance branches), not generic boilerplate.
+**All template sections are mandatory** — Goal, Context, Research Findings, Architecture, Design Rationale, Skills Reference, Implementation Phases, Verification, Review Checklist. Do not skip or stub any section. Fill Verification and Review Checklist with project-specific content gathered during the interview, not generic boilerplate.
 
 - Self-review before writing: spec coverage, placeholder scan, type/name consistency, **verify all template sections present with project-specific content**
 - Write to system plan file (`.claude/plans/<name>.md`)
-- ExitPlanMode for user review
+- ExitPlanMode for user review. If Option A was chosen, include the `/goal` condition in the exit message.
 
 ## Question Design
 
@@ -105,26 +121,25 @@ Write a self-contained implementation plan to the system plan file using the tem
 | Provide recommended answer with reasoning | Ask without a suggested direction |
 | One question per message | Batch 3 questions in one message |
 | Ask about edge cases and error handling | Only ask about the happy path |
-| Walk design tree branches sequentially | Jump between unrelated topics |
+| Walk branches in goal-relevance order | Jump between unrelated topics |
 | Cite research findings in recommendations | Ignore external research |
+| Refine /goal condition as decisions resolve | Leave the goal vague or unmeasurable |
 
-## Red Flags
+## Red Flags & Common Mistakes
 
-| Rationalization | Reality |
+| Rationalization | Consequence |
 |---|---|
 | "I already know what they want" | Your assumption is the spec's biggest blind spot |
 | "This is too simple to need an interview" | Simple features have the most unexamined assumptions |
 | "I can infer the answers from the codebase" | Codebase shows WHAT exists, not WHAT the user wants |
-| "Let me just ask all questions at once" | Batched questions get shallow answers |
+| "Let me just ask all questions at once" | Batched questions get shallow answers — one at a time |
 | "The user seems impatient, skip some questions" | Skipping costs more in rework than asking costs now |
-| "I don't need to research first" | You'll ask questions whose answers are in the docs |
-| "Skip research, just use what I know" | Your training data is stale. Research current state. |
+| "Skip research, just use what I know" | Training data is stale. Research current state first. |
+| "The goal is obvious, skip definition" | Vague goals produce vague plans. Define it explicitly. |
 
-## Common Mistakes
-
-- Asking questions the codebase already answers (didn't do Phase 2)
-- Skipping external research (missed modern approaches, known pitfalls)
-- Batching multiple questions in one message (shallow answers)
+**Process mistakes:**
 - Writing plan without the plan template (implementer gets incomplete context)
 - Not presenting research findings before questions (user can't make informed decisions)
 - Exiting plan mode before writing spec (if "Both" was chosen)
+- Not refining /goal condition as technical decisions resolve (stale goal)
+- Writing flat tasks instead of phased implementation (no parallelization or gates)
